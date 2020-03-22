@@ -8,6 +8,7 @@ pygame.display.set_caption('2048')
 game = Board()
 
 FONT = pygame.font.Font('freesansbold.ttf', 28) 
+SMALLFONT = pygame.font.Font('freesansbold.ttf', 17) 
 IMAGESIZE = 130
 IMAGES = []
 NAMES = ["oliver", "owen", "cass", "alastair",
@@ -47,7 +48,15 @@ def write_score():
     textRc = text.get_rect()
     textRc.left = 450
     textRc.top = 20
+
+    goal = SMALLFONT.render('Combine tiles to reach the coveted Harry tile',
+                        True, colour.BLACK)
+    goalRc = goal.get_rect()
+    goalRc.left = 20
+    goalRc.bottom = textRc.bottom
+    
     screen.blit(text, textRc)
+    screen.blit(goal, goalRc)
 
 def gameOver():
     endTxt = FONT.render('Game Over', True, colour.WHITE)
