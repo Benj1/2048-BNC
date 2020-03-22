@@ -1,5 +1,5 @@
 import random
-from tile import Tile, EmptyTile
+from tile import Tile, EmptyTile, MAXTILE
 
 class Board(object):
     def __init__(self):
@@ -164,5 +164,14 @@ class Board(object):
                 for j in range(3):
                     if self.grid[j][i] == self.grid[j+1][i]:
                         return True
+    
+    def checkWin(self):
+        win = False
+        for row in self.grid:
+            for t in row:
+                if t.image_index == MAXTILE - 1:
+                    win = True
+        return win
+
                     
                 

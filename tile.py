@@ -28,6 +28,7 @@ class Tile(object):
 class EmptyTile(Tile):
     def __init__(self):
         self.value = 0
+        self.image_index = 0
         self.colour = "grey"
     def __str__(self):
         return " "

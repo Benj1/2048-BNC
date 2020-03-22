@@ -14,7 +14,6 @@ IMAGES = []
 NAMES = ["oliver", "owen", "cass", "alastair",
         "clare", "cath", "ben", "alexp", "alexs", "louise", "melissa", 
         "henry", "david",  "nic", "harry"]
-
 for name in NAMES:
     im = pygame.image.load("images/" + name + ".jpeg").convert()
     im = pygame.transform.scale(im, (IMAGESIZE,IMAGESIZE))
@@ -58,8 +57,8 @@ def write_score():
     screen.blit(text, textRc)
     screen.blit(goal, goalRc)
 
-def gameOver():
-    endTxt = FONT.render('Game Over', True, colour.WHITE)
+def gameDialog(message):
+    endTxt = FONT.render(message, True, colour.WHITE)
     endTxtRc = endTxt.get_rect(center = (310, 200))
     scoreTxt = FONT.render('Final Score: ' + str(game.score), True, colour.WHITE)
     scoreTxtRc = scoreTxt.get_rect(center = (310, 250))
@@ -103,9 +102,12 @@ while True:
     draw_empty_tiles()
     draw_tiles()
     write_score()
+    if game.checkWin():
+        reRc, quitRc = gameDialog("You Win!")
+        playMode = False
     if not game.stillAlive():
         playMode = False
-        reRc, quitRc = gameOver()
+        reRc, quitRc = gameDialog("Game Over")
 
     pygame.display.update()
     pygame.time.delay(30)
