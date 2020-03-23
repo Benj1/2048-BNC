@@ -8,7 +8,7 @@ Instructions to install:
 2) type "python --version" and press enter. Hopefully you have version 3 (e.g. Python 3.7.4), but if not, go to the getting python step.
 3) type "pip install pygame"
 4) Download the game and unzip the folder. Move the folder to a memorable location, e.g. C:\\Users\benmc\documents
-5) Navigate to the game folder using "cd <<INSERT FOLDER HERE>>" (e.g. cd C:\\Users\benmc\documents\2048-BNC)
+5) Navigate to the game folder using "cd <INSERT FOLDER HERE>" (e.g. cd C:\\Users\benmc\documents\2048-BNC)
 6) type "python main.py" in the command prompt and press enter 
 
 Getting Python:
