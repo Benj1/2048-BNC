@@ -1,5 +1,6 @@
 import random
 from tile import Tile, EmptyTile, MAXTILE
+import pygame
 
 class Board(object):
     def __init__(self):
@@ -26,26 +27,29 @@ class Board(object):
         bCol = int((b - bRow) / 4)
         self.grid[bRow][bCol] = Tile()
     
-    def set_tile_displays(self):
+    def reset_tiles(self):
         for row in self.grid:
             for tile in row:
                 tile.set_display()
+                tile.speed = (0,0)
+                tile.scale = 1
 
     def move(self, direction):
         newTile = False
-        if direction == 'l':
+        if direction == pygame.K_LEFT:
             newTile = self._moveLeft()
-        elif direction == 'r':
+        elif direction == pygame.K_RIGHT:
             newTile = self._moveRight()
-        elif direction == 'd':
+        elif direction == pygame.K_DOWN:
             newTile = self._moveDown()
-        elif direction == 'u':
+        elif direction == pygame.K_UP:
             newTile = self._moveUp()
-        else:
-            pass
-        self.set_tile_displays()
+
         if newTile:
-            self.addTile()
+            tile, pos = self.addTile()
+            return (newTile, tile, pos)
+        return (False, 0, 0)
+        
 
     def _moveLeft(self):
         success = False
@@ -61,12 +65,15 @@ class Board(object):
                         self.score += tile.value * 2
                         success = True
                         mergeAllow = False
+                        tile.speed = (k-1-j,0)
                     else:
                         self.grid[i][k] = tile  # place the tile in the leftmost pos
+                        tile.speed = (k-j,0)
                         if k != j:
                             success = True
                         k+=1
                         mergeAllow = True
+                        
         return success
 
     def _moveRight(self):
@@ -83,8 +90,10 @@ class Board(object):
                         self.score += tile.value * 2
                         success = True
                         mergeAllow = False
+                        tile.speed = (1- k + j,0)
                     else:
                         self.grid[i][3-k] = tile  # place the tile in the rightmost pos
+                        tile.speed = (j-k,0)
                         if k != j:
                             success = True
                         k+=1
@@ -105,8 +114,10 @@ class Board(object):
                         self.score += tile.value * 2
                         success = True
                         mergeAllow = False
+                        tile.speed = (0, 1-k+j)
                     else:
                         self.grid[3-k][i] = tile  # place the tile in the bottom pos
+                        tile.speed = (0, j-k)
                         if k != j:
                             success = True
                         k+=1
@@ -127,8 +138,10 @@ class Board(object):
                         self.score += tile.value * 2
                         success = True
                         mergeAllow = False
+                        tile.speed = (0, k-1-j)
                     else:
                         self.grid[k][i] = tile  # place the tile in the leftmost pos
+                        tile.speed = (0, k-j)
                         if k != j:
                             success = True
                         k+=1
@@ -148,9 +161,11 @@ class Board(object):
         a = random.choice(spaces)
         aRow = a % 4
         aCol = int((a - aRow)/4)
-        newTile = Tile()
-        newTile.scale = 0.1
-        self.grid[aRow][aCol] = newTile
+        new_tile = Tile()
+        new_tile.scale = 0.2
+        self.grid[aRow][aCol] = new_tile
+        return (new_tile, (aRow, aCol))
+
     
     def stillAlive(self):
         if len(self.emptySpaces()) > 0:

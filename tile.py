@@ -6,8 +6,8 @@ class Tile(object):
     def __init__(self):
         self.value = random.choice([2,2,4])
         self.image_index = 0
-        self.scale = 1
-
+        self.scale = 1  # Relevant for scaling new tiles during transitions
+        self.speed = (0,0) # Only relevant for transitions
         self.set_display()
     
     def __str__(self):
@@ -30,6 +30,7 @@ class EmptyTile(Tile):
         self.value = 0
         self.image_index = 0
         self.colour = "grey"
+        self.speed = (0,0)
     def __str__(self):
         return " "
     def isEmpty(self):

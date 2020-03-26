@@ -1,6 +1,7 @@
 import pygame, sys
 from board import Board
 import colour
+import copy
 pygame.init()
 
 screen = pygame.display.set_mode((620,680))
@@ -20,6 +21,7 @@ for name in NAMES:
     IMAGES.append(im)
 
 TILECOORDS = [[(20+150*i, 80+150*j) for i in range(4)] for j in range(4)]
+TRANSITIONLENGTH = 5
 
 def draw_empty_tiles():
     screen.fill(colour.LIGHTGREY)
@@ -34,12 +36,29 @@ def draw_tiles():
             tile = game.grid[i][j]
             if not tile.isEmpty():
                 image = IMAGES[tile.image_index]
-                if tile.scale < 1:
-                    size = round(tile.scale * IMAGESIZE)
-                    image = pygame.transform.scale(image, (size, size))
-                    tile.scale += 0.1
                 centre = (TILECOORDS[i][j][0] + 65, TILECOORDS[i][j][1] + 65)
                 imRc = image.get_rect(center=centre)
+                screen.blit(image, imRc)
+
+def draw_new_tile(tile, row, col):
+    image = IMAGES[tile.image_index]
+    size = round(tile.scale * IMAGESIZE)
+    image = pygame.transform.scale(image, (size, size))
+    centre = (TILECOORDS[row][col][0] + 65, TILECOORDS[row][col][1] + 65)
+    imRc = image.get_rect(center=centre)
+    tile.scale += 0.2
+    screen.blit(image, imRc)
+
+def draw_moving_tiles(frozen_grid, frame):
+    for i in range(4):
+        for j in range(4):
+            tile = frozen_grid[i][j]
+            if not tile.isEmpty():
+                image = IMAGES[tile.image_index]
+                centre = (TILECOORDS[i][j][0] + 65, TILECOORDS[i][j][1] + 65)
+                imRc = image.get_rect(center=centre)
+                imRc = imRc.move(tile.speed[0] * 150 / TRANSITIONLENGTH * frame,
+                                tile.speed[1] * 150 / TRANSITIONLENGTH * frame)
                 screen.blit(image, imRc)
 
 def write_score():
@@ -76,21 +95,26 @@ def gameDialog(message):
     return restartTxtRc,quitTxtRc
 
 playMode = True
+frame = 0
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+
         if event.type == pygame.KEYDOWN and playMode:
-            direction = 'none'
-            if event.key == pygame.K_UP:
-                direction = 'u'
-            elif event.key == pygame.K_DOWN:
-                direction = 'd'
-            elif event.key == pygame.K_LEFT:
-                direction = 'l'
-            elif event.key == pygame.K_RIGHT:
-                direction = 'r'
-            game.move(direction)
+            if 1 <= frame <= TRANSITIONLENGTH:
+                # Do something because transition not complete
+                game.reset_tiles()
+            freeze_grid = []
+            for row in game.grid:
+                freeze_grid.append(copy.copy(row))
+                
+            movement, t, p = game.move(event.key)
+            if movement:
+                new_tile = t
+                pos = p
+                frame = 1
+
         if event.type == pygame.MOUSEBUTTONDOWN and not playMode:
             pos = event.pos
             if reRc.collidepoint(pos):
@@ -98,10 +122,22 @@ while True:
                 playMode = True
             elif quitRc.collidepoint(pos):
                 sys.exit()
-              
+    
     draw_empty_tiles()
-    draw_tiles()
+    
+    if 1 <= frame < TRANSITIONLENGTH:
+        frame += 1
+        draw_moving_tiles(freeze_grid, frame)
+        draw_new_tile(new_tile, pos[0], pos[1])
+    elif frame == TRANSITIONLENGTH:
+        game.reset_tiles()
+        draw_tiles()
+        frame = 0
+    else: 
+        draw_tiles()
+    
     write_score()
+
     if game.checkWin():
         reRc, quitRc = gameDialog("You Win!")
         playMode = False
