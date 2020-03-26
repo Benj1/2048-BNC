@@ -13,8 +13,8 @@ SMALLFONT = pygame.font.Font('freesansbold.ttf', 17)
 IMAGESIZE = 130
 IMAGES = []
 NAMES = ["oliver", "owen", "cass", "alastair",
-        "clare", "cath", "ben", "alexp", "alexs", "louise", "melissa", 
-        "henry", "david",  "nic", "harry"]
+          "nic", "cath", "ben", "alexp", "alexs", "louise", "melissa", 
+        "henry", "david","clare", "harry"]
 for name in NAMES:
     im = pygame.image.load("images/" + name + ".jpeg").convert()
     im = pygame.transform.scale(im, (IMAGESIZE,IMAGESIZE))
@@ -96,6 +96,7 @@ def gameDialog(message):
 
 playMode = True
 frame = 0
+pause = 0
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -119,6 +120,7 @@ while True:
             pos = event.pos
             if reRc.collidepoint(pos):
                 game = Board()
+                pause = 0
                 playMode = True
             elif quitRc.collidepoint(pos):
                 sys.exit()
@@ -139,11 +141,17 @@ while True:
     write_score()
 
     if game.checkWin():
-        reRc, quitRc = gameDialog("You Win!")
         playMode = False
+        pause += 1
+        if pause > 30:
+            reRc, quitRc = gameDialog("You Win!")
+        
     if not game.stillAlive():
         playMode = False
-        reRc, quitRc = gameDialog("Game Over")
+        pause += 1
+        if pause > 30:
+            reRc, quitRc = gameDialog("You Win!")
+            reRc, quitRc = gameDialog("Game Over")
 
     pygame.display.update()
     pygame.time.delay(30)
